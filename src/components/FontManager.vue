@@ -13,7 +13,7 @@
 		<header>
 			<div class="font">Gekozen lettertype:&nbsp;<span :style="{ fontFamily: ''+font+'' }">{{ font }}</span></div>
 			<div class="search"><input type="text" placeholder="Zoeken in alle categorieën"></div>
-			<div class="close">x</div>
+			<div class="close"><i class="icon"></i></div>
 		</header>
 		<section id="content" v-on:scroll="loadFonts">
 			<h2 v-if="current_fonts.length">Resultaten: {{ current_fonts.length }}</h2>

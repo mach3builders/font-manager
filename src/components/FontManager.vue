@@ -11,7 +11,7 @@
 	<main>
 		<link rel="stylesheet" type="text/css" :href="getFontLink(font)">
 		<header>
-			<div class="font">Gekozen lettertype:&nbsp;<span :style="{ fontFamily: ''+font+'' }">{{ font }}</span></div>
+			<div class="font">Gekozen:&nbsp;<span :style="{ fontFamily: ''+font+'' }">{{ font }}</span></div>
 			<div class="search"><input type="text" placeholder="Zoeken in alle categorieën"></div>
 			<div class="close"><i class="icon"></i></div>
 		</header>
@@ -27,11 +27,11 @@
 									<span v-for="variant in font.variants" :class="variant == font.variant ? 'active' : ''" v-on:click="selectVariant(font, variant)">{{ variant }}</span>
 								</div>
 							</div>
-							<div class="text" :style="{ fontFamily: ''+font.family+'' }"><i class="icon"></i><span>The quick brown fox jumps over the lazy dog</span></div>
+							<div class="text" :style="{ fontFamily:''+font.family+'',fontStyle:font.style,fontWeight:font.weight }"><i class="icon"></i><span>The quick brown fox jumps over the lazy dog</span></div>
 						</div>
 						<div class="actions">
 							<div class="icons"></div>
-							<a class="btn">Lettertype kiezen</div>
+							<a class="btn">Selecteren</div>
 						</div>
 					</div>
 				</div>
@@ -89,6 +89,8 @@ export default {
 					if(!data[category]) data[category] = [];
 
 					item['variant']	= variants[0];
+					item['style']	= this.getFontStyle(variants[0]);
+					item['weight']	= this.getFontWeight(variants[0]);
 					item['loaded']	= false;
 
 					data[category].push(item);
@@ -101,6 +103,24 @@ export default {
 
 		activeCategory: function(category) {
 			return this.current_category === category;
+		},
+
+		getFontStyle: function(name) {
+			let style;
+
+			if (name.indexOf('italic') != -1)	style = 'italic';
+			else								style = 'normal';
+
+			return style;
+		},
+
+		getFontWeight: function(name) {
+			let weight;
+
+			if (parseInt(name) > 0)	weight = parseInt(name);
+			else					weight = 'normal';
+
+			return weight;
 		},
 
 		getFontLink: function(font) {
@@ -163,7 +183,11 @@ export default {
 		},
 
 		selectVariant: function(font, variant) {
-			font.variant = variant;
+			font.variant	= variant;
+			font.style		= this.getFontStyle(variant);
+			font.weight		= this.getFontWeight(variant);
+
+			console.log(font);
 		},
 
 		loadFonts: function() {

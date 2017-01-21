@@ -16,8 +16,7 @@
 			<div class="close"><i class="icon"></i></div>
 		</header>
 		<section id="content" v-on:scroll="loadFonts">
-			<strong>{{ search_indicator }}</strong>
-			<h2 v-if="current_fonts.length">Resultaten: {{ current_fonts.length }}</h2>
+			<h2 v-if="current_category.length">Resultaten: {{ current_fonts.length }}</h2>
 			<div class="fonts">
 				<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in current_fonts" :data-font="getLoaderFont(font)">
 					<div class="wrapper">
@@ -79,22 +78,10 @@ export default {
 		})
 	},
 
-	computed: {
-		search_indicator: function () {
-			if (this.is_calculating) {
-				return '⟳ Fetching new results'
-			} else if (this.search_query_is_dirty) {
-				return '... Typing'
-			} else {
-				return '✓ Done'
-			}
-		}
-	},
-
 	watch: {
 		search_query: function() {
 			this.search_query_is_dirty = true;
-			this.expensiveOperation();
+			this.searchFonts();
 		}
 	},
 
@@ -197,6 +184,7 @@ export default {
 				// set data
 				this.current_category	= category;
 				this.current_fonts		= this.data[category];
+				this.search_query		= '';
 
 				// scroll to top
 				this.$content.scrollTop	= 0;
@@ -223,7 +211,7 @@ export default {
 
 				for (let i=0; i<$els.length; i++) {
 					const $el	= $els[i];
-					const font	= this.data[this.current_category][i];
+					const font	= this.current_fonts[i];
 					
 					if (!font.loaded) {
 						const visible = this.isVisible($el);
@@ -263,32 +251,30 @@ export default {
 			);
 		},
 
-		expensiveOperation: debounce(function() {
+		searchFonts: debounce(function() {
 			this.is_calculating = true;
-			setTimeout(function() {
-				this.is_calculating = false;
-				this.search_query_is_dirty = false;
-				
-				if (this.search_query.length > 1) {
-					const result = [];
-					for (let category in this.data) {
-						const fonts = this.data[category];
+			this.is_calculating = false;
+			this.search_query_is_dirty = false;
+			
+			if (this.search_query.length > 1) {
+				const result = [];
+				for (let category in this.data) {
+					const fonts = this.data[category];
 
-						for (let i=0; i<fonts.length; i++) {
-							const font = fonts[i];
+					for (let i=0; i<fonts.length; i++) {
+						const font = fonts[i];
 
-							if (font.family.indexOf(this.search_query) != -1) {
-								result.push(font);
-							}
+						if (font.family.toLowerCase().indexOf(this.search_query.toLowerCase()) != -1) {
+							result.push(font);
 						}
 					}
-
-					console.log(result);
-
-					this.current_category	= 'search';
-					this.current_fonts		= result;
 				}
-			}.bind(this), 500);
+
+				this.current_category	= 'search';
+				this.current_fonts		= result;
+
+				this.loadFonts();
+			}
 		}, 500)
 	}
 }

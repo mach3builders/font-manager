@@ -1,0 +1,334 @@
+@mixin loader() {
+	color: rgba(0,0,0,0) !important;
+	cursor: default !important;
+	position: relative;
+	
+	&:before {
+		border: 2px solid rgba(0, 0, 0, 0.15);
+		border-radius: 7px;
+		content: '';
+		height: 10px;
+		left: 50%;
+		margin: -7px 0 0 -7px;
+		position: absolute;
+		top: 50%;
+		width: 10px;
+	}
+	
+	&:after {
+		animation: loader-spin 0.8s linear;
+		border-color: #fff transparent transparent;
+		border-radius: 7px;
+		border-style: solid;
+		border-width: 2px;
+		box-shadow: 0 0 0 1px transparent;
+		content: '';
+		height: 10px;
+		left: 50%;
+		margin: -7px 0 0 -7px;
+		position: absolute;
+		top: 50%;
+		width: 10px;
+		
+		-webkit-animation: loader-spin .8s linear;
+		-webkit-animation-iteration-count: infinite;
+				animation-iteration-count: infinite;
+	}
+}
+
+#wrapper {
+	color: #2c3e50;
+	display: flex;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	height: 100%;
+
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+
+	h2 {
+		font-size: 12px;
+		height: 50px;
+		line-height: 50px;
+		margin: 0 0 10px 0;
+		opacity: .65;
+		padding: 0 20px;
+		text-transform: uppercase;
+	}
+
+ 	> nav {
+		background-color: #273142;
+		color: #fff;
+		flex-shrink: 0;
+		min-width: 160px;
+
+		h2 {
+			padding: 0 30px;
+		}
+
+		ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+
+			a {
+				cursor: pointer;
+				display: block;
+				padding: 10px 30px;
+				text-transform: capitalize;
+				transition: background-color .2s ease-out;
+
+				&:hover,
+				&.active {
+					background-color: rgba(255, 255, 255, .1);
+				}
+			}
+		}
+	}
+
+	> main {
+		background-color: #eff3f6;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+
+		> header {
+			align-items: center;
+			background-color: #fff;
+			border-bottom: 1px solid #dee2e6;
+			box-sizing: border-box;
+			display: flex;
+			flex-shrink: 0;
+			height: 50px;
+			padding: 0 40px;
+
+			.font,
+			.close {
+				flex-basis: 25%;
+				flex-shrink: 0;
+			}
+
+			.search {
+				flex-basis: 50%;
+				flex-grow: 1;
+
+				input {
+					background-color: #f9fbfc;
+					border: 1px solid #dee2e6;
+					border-radius: 3px;
+					box-sizing: border-box;
+					font-size: 12px;
+					height: 40px;
+					outline: none;
+					padding: 9px;
+					transition: background-color .2s ease-out,
+								border-color .2s ease-out;
+					width: 100%;
+
+					&:focus {
+						background-color: #fff;
+						border-color: #2ea1f8;
+					}
+				}
+			}
+		}
+
+		#content {
+			flex-grow: 1;
+			overflow: auto;
+			padding: 30px 40px 0 40px;
+
+			.fonts {
+				background-color: #fff;
+				border-radius: 3px;
+				box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+				margin-bottom: 40px;
+
+				.font {
+					border-bottom: 1px solid #eff3f6;
+					padding: 30px 20px;
+
+					.wrapper {
+						display: flex;
+
+						.example {
+							cursor: default;
+							flex-grow: 1;
+
+							.family {
+								display: flex;
+								font-size: 12px;
+								font-weight: bold;
+								line-height: 20px;
+								margin-bottom: 20px;
+								text-transform: uppercase;
+
+								.name {
+									opacity: .5;
+									white-space: nowrap;
+								}
+
+								.variants {
+									align-items: center;
+									display: flex;
+									flex-wrap: wrap;
+									font-size: 10px;
+									font-weight: normal;
+									line-height: 20px;
+									margin-left: 10px;
+									opacity: 0;
+									transition: opacity .2s ease-out;
+
+									span {
+										background-color: #eff3f6;
+										border-radius: 3px;
+										cursor: pointer;
+										margin: 0 0 10px 10px;
+										padding: 0 10px;
+										transition: background-color .2s ease-out,
+													color .2s ease-out;
+
+										&:hover {
+											background-color: #dee2e6;
+										}
+
+										&.active {
+											background-color: #2ea1f8;
+											color: #fff;
+											cursor: default;
+										}
+									}
+								}
+							}
+
+							.text {
+								align-items: center;
+								display: flex;
+								font-size: 24px;
+								line-height: 1.2em;
+
+								> .icon {
+									display: none;
+									height: 20px;
+									width: 20px;
+								}
+
+								> span {
+									opacity: 1;
+									transition: opacity .6s ease-out;
+								}
+							}
+						}
+
+						.actions {
+							display: flex;
+							flex-direction: column;
+							flex-shrink: 0;
+
+							.icons {
+								flex-grow: 1;
+							}
+
+							.btn {
+								flex-shrink: 0;
+								opacity: 0;
+								transition: opacity .1s ease-out;
+							}
+						}
+					}
+
+					// &:not(.loader) {
+					// 	.wrapper {
+					// 		.example {
+					// 			.family {
+					// 				.variants {
+					// 					opacity: 1;
+					// 				}
+					// 			}
+					// 		}
+					// 	}
+					// }
+
+					&:not(.loader):hover {
+						.wrapper {
+							.example {
+								.family {
+									.variants {
+										opacity: 1;
+									}
+								}
+							}
+							
+							.actions {
+								.btn {
+									opacity: 1;
+								}
+							}
+						}
+					}
+
+					&.loader {
+						.wrapper {
+							.example {
+								.text {
+									> .icon {
+										display: block;
+										@include loader;
+									}
+
+									> span {
+										opacity: 0;
+										transition: opacity 0s ease-out;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			.btn {
+				background-color: #2ea1f8;
+				border-radius: 3px;
+				color: #fff;
+				cursor: pointer;
+				display: inline-block;
+				font-size: 12px;
+				line-height: 20px;
+				padding: 6px 16px;
+				position: relative;
+				text-transform: uppercase;
+				transition: background-color .2s ease-out;
+				text-decoration: none;
+				white-space: nowrap;
+
+				&:hover {
+					background-color: #088ff5;
+				}
+			}
+		}
+	}
+}
+
+/* animation keyframes */
+@-webkit-keyframes loader-spin {
+	from {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	to {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes loader-spin {
+	from {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	to {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
+	}
+}

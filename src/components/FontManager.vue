@@ -92,7 +92,7 @@ export default {
 	},
 
 	watch: {
-			search_query: function () {
+		search_query: function() {
 			this.search_query_is_dirty = true;
 			this.expensiveOperation();
 		}
@@ -132,7 +132,7 @@ export default {
 		getFontStyle: function(name) {
 			let style;
 
-			if (name.indexOf('italic') != -1)	style = 'italic';
+			if (name.indexOf('italic') !== -1)	style = 'italic';
 			else								style = 'normal';
 
 			return style;
@@ -268,7 +268,27 @@ export default {
 			setTimeout(function() {
 				this.is_calculating = false;
 				this.search_query_is_dirty = false;
-			}.bind(this), 1000);
+				
+				if (this.search_query.length > 1) {
+					const result = [];
+					for (let category in this.data) {
+						const fonts = this.data[category];
+
+						for (let i=0; i<fonts.length; i++) {
+							const font = fonts[i];
+
+							if (font.family.indexOf(this.search_query) != -1) {
+								result.push(font);
+							}
+						}
+					}
+
+					console.log(result);
+
+					this.current_category	= 'search';
+					this.current_fonts		= result;
+				}
+			}.bind(this), 500);
 		}, 500)
 	}
 }

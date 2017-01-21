@@ -112,6 +112,7 @@
 			}
 
 			.search {
+				display: flex;
 				flex-basis: 50%;
 				flex-grow: 1;
 				position: relative;
@@ -244,6 +245,7 @@
 								display: flex;
 								font-size: 24px;
 								line-height: 1.2em;
+								margin-right: 10px;
 
 								> .icon {
 									display: none;

@@ -12,10 +12,11 @@
 		<link rel="stylesheet" type="text/css" :href="getFontLink(font)">
 		<header>
 			<div class="font">Gekozen:&nbsp;<span :style="{ fontFamily: ''+font+'' }">{{ font }}</span></div>
-			<div class="search"><input type="text" placeholder="Zoeken in alle categorieën"></div>
+			<div class="search"><input type="text" v-model="search_query" placeholder="Zoeken in alle categorieën"></div>
 			<div class="close"><i class="icon"></i></div>
 		</header>
 		<section id="content" v-on:scroll="loadFonts">
+			<strong>{{ search_indicator }}</strong>
 			<h2 v-if="current_fonts.length">Resultaten: {{ current_fonts.length }}</h2>
 			<div class="fonts">
 				<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in current_fonts" :data-font="getLoaderFont(font)">
@@ -42,7 +43,8 @@
 </template>
 
 <script>
-import WebFont from 'webfontloader'
+import WebFont from 'webfontloader';
+import debounce from 'lodash/debounce';
 
 export default {
 	props: {
@@ -54,6 +56,9 @@ export default {
 			$content: undefined,
 			api_url: '//fonts.googleapis.com/css?family=',
 			data: {},
+			search_query: '',
+    		search_query_is_dirty: false,
+			is_calculating: false,
 			current_category: { type: String },
 			current_font: { type: String },
 			current_fonts: [],
@@ -72,6 +77,25 @@ export default {
 		}, (response) => {
 			console.error(response);
 		})
+	},
+
+	computed: {
+		search_indicator: function () {
+			if (this.is_calculating) {
+				return '⟳ Fetching new results'
+			} else if (this.search_query_is_dirty) {
+				return '... Typing'
+			} else {
+				return '✓ Done'
+			}
+		}
+	},
+
+	watch: {
+			search_query: function () {
+			this.search_query_is_dirty = true;
+			this.expensiveOperation();
+		}
 	},
 
 	methods: {
@@ -186,8 +210,6 @@ export default {
 			font.variant	= variant;
 			font.style		= this.getFontStyle(variant);
 			font.weight		= this.getFontWeight(variant);
-
-			console.log(font);
 		},
 
 		loadFonts: function() {
@@ -207,22 +229,26 @@ export default {
 						const visible = this.isVisible($el);
 
 						if (visible && !font.init) {
-							WebFont.load({
-								google: {
-									families: [font.family]
-								},
-								fontloading: function(family, fvd) {
-									font.init = true;
-								},
-								fontactive: function(family, fvd) {
-									font.init	= false;
-									font.loaded	= true;
-								}
-							});
+							this.loadFont(font);
 						}
 					}
 				}
 			}, this.delay);
+		},
+
+		loadFont: function(font) {
+			WebFont.load({
+				google: {
+					families: [font.family]
+				},
+				fontloading: function(family, fvd) {
+					font.init = true;
+				},
+				fontactive: function(family, fvd) {
+					font.init	= false;
+					font.loaded	= true;
+				}
+			});
 		},
 
 		isVisible: function($el) {
@@ -235,7 +261,15 @@ export default {
 				el_position.top >= (0 - content_top) && 
 				el_position.bottom <= (content_height + (content_top + 20))
 			);
-		}
+		},
+
+		expensiveOperation: debounce(function() {
+			this.is_calculating = true;
+			setTimeout(function() {
+				this.is_calculating = false;
+				this.search_query_is_dirty = false;
+			}.bind(this), 1000);
+		}, 500)
 	}
 }
 </script>

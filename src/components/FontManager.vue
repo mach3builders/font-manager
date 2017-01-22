@@ -49,30 +49,39 @@ import WebFont from 'webfontloader';
 import debounce from 'lodash/debounce';
 
 export default {
+	/**
+	 * Properties passed from <font-manager>
+	 */
 	props: {
-		fontFamily: { type: String },
-		fontStyle: { type: String },
-		fontWeight: { type: String }
+		fontFamily	: { type: String },
+		fontStyle	: { type: String },
+		fontWeight	: { type: String }
 	},
 
+	/**
+	 * Properties handled from within this component
+	 */
 	data: function () {
 		return {
-			mutableFontFamily: this.fontFamily,
-			mutableFontStyle: this.fontStyle || 'normal',
-			mutableFontWeight: this.fontWeight || 'normal',
-			$content: undefined,
-			apiUrl: '//fonts.googleapis.com/css?family=',
-			data: {},
-			searchQuery: '',
-    		searchQueryIsDirty: false,
-			isCalculating: false,
-			currentCategory: { type: String },
-			currentFonts: [],
-			timer: undefined,
-			delay: 200
+			mutableFontFamily	: this.fontFamily,
+			mutableFontStyle	: this.fontStyle || 'normal',
+			mutableFontWeight	: this.fontWeight || 'normal',
+			$content			: undefined,
+			apiUrl				: '//fonts.googleapis.com/css?family=',
+			data				: {},
+			searchQuery			: '',
+    		searchQueryIsDirty	: false,
+			isCalculating		: false,
+			currentCategory		: { type: String },
+			currentFonts		: [],
+			timer				: undefined,
+			delay				: 200
 		}
 	},
 
+	/*
+	 * Lifecycle methods
+	 */
 	mounted: function() {
 		this.$content = this.$el.querySelector('#content');
 		
@@ -85,6 +94,9 @@ export default {
 		})
 	},
 
+	/*
+	 * Properties being watched for changes
+	 */
 	watch: {
 		searchQuery: function() {
 			this.searchQueryIsDirty = true;
@@ -92,7 +104,15 @@ export default {
 		}
 	},
 
+	/*
+	 * Component methods
+	 */
 	methods: {
+
+		/*
+		 * Here we build the data used in this component
+		 * This is done in the "mounted" lifecycle method
+		 */
 		buildData: function(items) {
 			const data		= {};
 			const families	= [];
@@ -119,10 +139,16 @@ export default {
 			this.data = data;
 		},
 
+		/*
+		 * Check if the category must be activated in the navigation side
+		 */
 		isActiveCategory: function(category) {
 			return this.currentCategory === category;
 		},
 
+		/*
+		 * Some small logic for getting the font style
+		 */
 		getFontStyle: function(name) {
 			let style;
 
@@ -132,6 +158,9 @@ export default {
 			return style;
 		},
 
+		/*
+		 * Some small logic for getting the font weight
+		 */
 		getFontWeight: function(name) {
 			let weight;
 
@@ -141,51 +170,63 @@ export default {
 			return weight;
 		},
 
+		/*
+		 * Some small logic for getting the font link
+		 */
 		getFontLink: function(font) {
 			font = font.replace(/ /g, '+');
 			return '//fonts.googleapis.com/css?family='+font;
 		},
 
+		/*
+		 * Get the full url for the google font api
+		 */
 		getApiUrl: function(font) {
-			var api_font = [];
-			api_font.push(this.apiUrl);
-			api_font.push(font.family.replace(/ /g, '+'));
+			var apiFont = [];
+			apiFont.push(this.apiUrl);
+			apiFont.push(font.family.replace(/ /g, '+'));
 			
 			if (font.variants[0]) {
-				api_font.push(':');
-				api_font.push(font.variants[0]);
+				apiFont.push(':');
+				apiFont.push(font.variants[0]);
 			}
 
 			if (font.subsets[0]) {
-				api_font.push('&subset=');
-				api_font.push(font.subsets[0]);
+				apiFont.push('&subset=');
+				apiFont.push(font.subsets[0]);
 			}
 
-			// url: '//fonts.googleapis.com/css?family=Anonymous+Pro:italic&subset=greek'
-			var font = api_font.join('');
+			// example: '//fonts.googleapis.com/css?family=Anonymous+Pro:italic&subset=greek'
+			var font = apiFont.join('');
 			
 			return font;
 		},
 
+		/*
+		 * Get the font for the Google Font Loader
+		 */
 		getLoaderFont: function(font) {
-			var api_font = [];
-			api_font.push(font.family);
+			var apiFont = [];
+			apiFont.push(font.family);
 			
 			if (font.variants[0]) {
-				api_font.push(':');
-				api_font.push(font.variants[0]);
+				apiFont.push(':');
+				apiFont.push(font.variants[0]);
 			}
 
 			if (font.subsets[0]) {
-				api_font.push(':');
-				api_font.push(font.subsets[0]);
+				apiFont.push(':');
+				apiFont.push(font.subsets[0]);
 			}
 
-			var font = api_font.join('');
+			var font = apiFont.join('');
 			
 			return font;
 		},
 
+		/*
+		 * The method called when you click on a category in the navigation side
+		 */
 		selectCategory: function(category) {
 			if (this.data[category]) {
 				// set data
@@ -201,20 +242,32 @@ export default {
 			}
 		},
 
+		/*
+		 * Select a variant of the font hovered
+		 */
 		selectVariant: function(font, variant) {
 			font.variant	= variant;
 			font.style		= this.getFontStyle(variant);
 			font.weight		= this.getFontWeight(variant);
 		},
 
+		/*
+		 * Select the font we want to use
+		 */
 		selectFont: function(font) {
 			this.mutableFontFamily = font.family;
 		},
 
+		/*
+		 * Close the window/component
+		 */
 		close: function() {
 			alert('Close window');
 		},
 
+		/*
+		 * Load all fonts which are visible in the viewport
+		 */
 		loadFonts: function() {
 			if (this.timer) {
 				clearTimeout(this.timer);
@@ -239,6 +292,9 @@ export default {
 			}, this.delay);
 		},
 
+		/*
+		 * Load the font, done with Google Font Loader JS
+		 */
 		loadFont: function(font) {
 			WebFont.load({
 				google: {
@@ -254,22 +310,28 @@ export default {
 			});
 		},
 
+		/*
+		 * Is the font visible in the viewport? So we can call the loader...
+		 */
 		isVisible: function($el) {
-			const el_position		= $el.getBoundingClientRect();
-			const el_height			= el_position.height;
-			const content_top		= this.$content.getBoundingClientRect().top;
-			const content_height	= this.$content.getBoundingClientRect().height;
+			const elPosition	= $el.getBoundingClientRect();
+			const elHeight		= elPosition.height;
+			const contentTop	= this.$content.getBoundingClientRect().top;
+			const contentHeight	= this.$content.getBoundingClientRect().height;
 
 			return (
-				el_position.top >= (0 - content_top) && 
-				el_position.bottom <= (content_height + (content_top + 20))
+				elPosition.top >= (0 - contentTop) && 
+				elPosition.bottom <= (contentHeight + (contentTop + 20))
 			);
 		},
 
+		/*
+		 * Searching fonts mechanism
+		 */
 		searchFonts: debounce(function() {
-			this.isCalculating = true;
-			this.isCalculating = false;
-			this.searchQueryIsDirty = false;
+			this.isCalculating		= true;
+			this.isCalculating		= false;
+			this.searchQueryIsDirty	= false;
 			
 			if (this.searchQuery.length > 1) {
 				const result = [];

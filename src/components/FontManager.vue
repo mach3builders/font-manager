@@ -5,15 +5,15 @@
 	<nav>
 		<h2>Categorie&euml;n</h2>
 		<ul>
-			<li v-for="(item, category) in data"><a :class="{ active: activeCategory(category) }" v-on:click="selectCategory(category)">{{ category }}</a></li>
+			<li v-for="(item, category) in data"><a :class="{ active: isActiveCategory(category) }" v-on:click="selectCategory(category)">{{ category }}</a></li>
 		</ul>
 	</nav>
 	<main>
 		<link rel="stylesheet" type="text/css" :href="getFontLink(font)">
 		<header>
-			<div class="font">Gekozen:&nbsp;<span :style="{ fontFamily: ''+font+'' }">{{ font }}</span></div>
+			<div class="font" :style="{ fontFamily: ''+mutable_font+'' }">Gekozen:&nbsp;<span>{{ mutable_font }}</span></div>
 			<div class="search"><input type="text" v-model="search_query" placeholder="Zoeken in alle categorieën"></div>
-			<div class="close"><i class="icon"></i></div>
+			<div class="close" v-on:click="close"><i class="icon"></i></div>
 		</header>
 		<section id="content" v-on:scroll="loadFonts">
 			<h2 v-if="current_category.length">Resultaten: {{ current_fonts.length }}</h2>
@@ -31,7 +31,7 @@
 						</div>
 						<div class="actions">
 							<div class="icons"></div>
-							<a class="btn">Selecteren</div>
+							<a class="btn" v-on:click="selectFont(font)">Selecteren</div>
 						</div>
 					</div>
 				</div>
@@ -52,6 +52,7 @@ export default {
 
 	data: function () {
 		return {
+			mutable_font: this.font,
 			$content: undefined,
 			api_url: '//fonts.googleapis.com/css?family=',
 			data: {},
@@ -112,7 +113,7 @@ export default {
 			this.data = data;
 		},
 
-		activeCategory: function(category) {
+		isActiveCategory: function(category) {
 			return this.current_category === category;
 		},
 
@@ -198,6 +199,14 @@ export default {
 			font.variant	= variant;
 			font.style		= this.getFontStyle(variant);
 			font.weight		= this.getFontWeight(variant);
+		},
+
+		selectFont: function(font) {
+			this.mutable_font = font.family;
+		},
+
+		close: function() {
+			alert('Close window');
 		},
 
 		loadFonts: function() {

@@ -9,16 +9,19 @@
 		</ul>
 	</nav>
 	<main>
-		<link rel="stylesheet" type="text/css" :href="getFontLink(font)">
+		<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily)">
 		<header>
-			<div class="font" :style="{ fontFamily: ''+mutable_font+'' }">Gekozen:&nbsp;<span>{{ mutable_font }}</span></div>
-			<div class="search"><input type="text" v-model="search_query" placeholder="Zoeken in alle categorieën"></div>
+			<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }">Gekozen:&nbsp;<span>{{ mutableFontFamily }}</span></div>
+			<div class="search"><input type="text" v-model="searchQuery" placeholder="Zoeken in alle categorieën" maxlength="50"></div>
 			<div class="close" v-on:click="close"><i class="icon"></i></div>
 		</header>
 		<section id="content" v-on:scroll="loadFonts">
-			<h2 v-if="current_category.length">Resultaten: {{ current_fonts.length }}</h2>
+			<input type="text" name="font[0]" :value="mutableFontFamily" id="my-font-family">
+			<input type="text" name="style[0]" :value="mutableFontStyle" id="my-font-style">
+			<input type="text" name="weight[0]" :value="mutableFontWeight" id="my-font-weight">
+			<h2 v-if="currentCategory.length">Resultaten: {{ currentFonts.length }}</h2>
 			<div class="fonts">
-				<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in current_fonts" :data-font="getLoaderFont(font)">
+				<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in currentFonts" :data-font="getLoaderFont(font)">
 					<div class="wrapper">
 						<div class="example">
 							<div class="family">
@@ -47,21 +50,24 @@ import debounce from 'lodash/debounce';
 
 export default {
 	props: {
-		font: { type: String }
+		fontFamily: { type: String },
+		fontStyle: { type: String },
+		fontWeight: { type: String }
 	},
 
 	data: function () {
 		return {
-			mutable_font: this.font,
+			mutableFontFamily: this.fontFamily,
+			mutableFontStyle: this.fontStyle || 'normal',
+			mutableFontWeight: this.fontWeight || 'normal',
 			$content: undefined,
-			api_url: '//fonts.googleapis.com/css?family=',
+			apiUrl: '//fonts.googleapis.com/css?family=',
 			data: {},
-			search_query: '',
-    		search_query_is_dirty: false,
-			is_calculating: false,
-			current_category: { type: String },
-			current_font: { type: String },
-			current_fonts: [],
+			searchQuery: '',
+    		searchQueryIsDirty: false,
+			isCalculating: false,
+			currentCategory: { type: String },
+			currentFonts: [],
 			timer: undefined,
 			delay: 200
 		}
@@ -80,8 +86,8 @@ export default {
 	},
 
 	watch: {
-		search_query: function() {
-			this.search_query_is_dirty = true;
+		searchQuery: function() {
+			this.searchQueryIsDirty = true;
 			this.searchFonts();
 		}
 	},
@@ -114,7 +120,7 @@ export default {
 		},
 
 		isActiveCategory: function(category) {
-			return this.current_category === category;
+			return this.currentCategory === category;
 		},
 
 		getFontStyle: function(name) {
@@ -142,7 +148,7 @@ export default {
 
 		getApiUrl: function(font) {
 			var api_font = [];
-			api_font.push(this.api_url);
+			api_font.push(this.apiUrl);
 			api_font.push(font.family.replace(/ /g, '+'));
 			
 			if (font.variants[0]) {
@@ -183,9 +189,9 @@ export default {
 		selectCategory: function(category) {
 			if (this.data[category]) {
 				// set data
-				this.current_category	= category;
-				this.current_fonts		= this.data[category];
-				this.search_query		= '';
+				this.currentCategory	= category;
+				this.currentFonts		= this.data[category];
+				this.searchQuery		= '';
 
 				// scroll to top
 				this.$content.scrollTop	= 0;
@@ -202,7 +208,7 @@ export default {
 		},
 
 		selectFont: function(font) {
-			this.mutable_font = font.family;
+			this.mutableFontFamily = font.family;
 		},
 
 		close: function() {
@@ -220,7 +226,7 @@ export default {
 
 				for (let i=0; i<$els.length; i++) {
 					const $el	= $els[i];
-					const font	= this.current_fonts[i];
+					const font	= this.currentFonts[i];
 					
 					if (!font.loaded) {
 						const visible = this.isVisible($el);
@@ -261,11 +267,11 @@ export default {
 		},
 
 		searchFonts: debounce(function() {
-			this.is_calculating = true;
-			this.is_calculating = false;
-			this.search_query_is_dirty = false;
+			this.isCalculating = true;
+			this.isCalculating = false;
+			this.searchQueryIsDirty = false;
 			
-			if (this.search_query.length > 1) {
+			if (this.searchQuery.length > 1) {
 				const result = [];
 				for (let category in this.data) {
 					const fonts = this.data[category];
@@ -273,14 +279,14 @@ export default {
 					for (let i=0; i<fonts.length; i++) {
 						const font = fonts[i];
 
-						if (font.family.toLowerCase().indexOf(this.search_query.toLowerCase()) != -1) {
+						if (font.family.toLowerCase().indexOf(this.searchQuery.toLowerCase()) != -1) {
 							result.push(font);
 						}
 					}
 				}
 
-				this.current_category	= 'search';
-				this.current_fonts		= result;
+				this.currentCategory	= 'search';
+				this.currentFonts		= result;
 
 				this.loadFonts();
 			}

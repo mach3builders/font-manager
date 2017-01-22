@@ -255,7 +255,9 @@ export default {
 		 * Select the font we want to use
 		 */
 		selectFont: function(font) {
-			this.mutableFontFamily = font.family;
+			this.mutableFontFamily	= font.family;
+			this.mutableFontStyle	= font.style;
+			this.mutableFontWeight	= font.weight;
 		},
 
 		/*

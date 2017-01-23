@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function()
 			$handler.addEventListener('click', (e) => {
 				e.preventDefault();
 				fm.$refs.fontManager.active = true;
+
+				// temp
+				$handler.parentNode.parentNode.removeChild($handler.parentNode);
 			});
 		}
 	}

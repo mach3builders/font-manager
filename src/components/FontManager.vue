@@ -5,7 +5,12 @@
 	<nav>
 		<h2>Categorie&euml;n</h2>
 		<ul>
-			<li v-for="(item, category) in data"><a :class="{ active: isActiveCategory(category) }" v-on:click="selectCategory(category)">{{ category }}</a></li>
+			<li v-for="(item, category) in data">
+				<a :class="{ active: isActiveCategory(category) }" v-on:click="selectCategory(category)">
+					<span class="name">{{ category }}</span>
+					<span class="label" v-if="category == 'favorites'">{{ favoriteAmount }}</span>
+				</a>
+			</li>
 		</ul>
 	</nav>
 	<main>
@@ -34,7 +39,7 @@
 							<div class="text" :style="{ fontFamily:''+font.family+'',fontStyle:font.style,fontWeight:font.weight }"><i class="icon"></i><span>The quick brown fox jumps over the lazy dog</span></div>
 						</div>
 						<div class="actions">
-							<div class="icons"></div>
+							<div class="icons"><i class="icon favorite" :class="font.favorite ? 'yes' : ''" v-on:click="selectFavorite(font)"></i></div>
 							<a class="btn" v-on:click="selectFont(font)">Selecteren</div>
 						</div>
 					</div>
@@ -64,7 +69,9 @@ export default {
 	 */
 	data: function () {
 		return {
-			active				: false,
+			amount				: 0,
+			favoriteAmount		: 0,
+			active				: true,
 			mutableFontFamily	: this.fontFamily,
 			mutableFontStyle	: this.fontStyle || 'normal',
 			mutableFontWeight	: this.fontWeight || 'normal',
@@ -116,8 +123,9 @@ export default {
 		 * This is done in the "mounted" lifecycle method
 		 */
 		buildData: function(items) {
-			const data		= {};
-			const families	= [];
+			const data			= {};
+			data['favorites']	= [];
+			const families		= [];
 
 			for (let i=0; i<items.length; i++) {
 				const item		= items[i];
@@ -128,10 +136,11 @@ export default {
 				if (category && family) {
 					if(!data[category]) data[category] = [];
 
-					item['variant']	= variants[0];
-					item['style']	= this.getFontStyle(variants[0]);
-					item['weight']	= this.getFontWeight(variants[0]);
-					item['loaded']	= false;
+					item['variant']		= variants[0];
+					item['style']		= this.getFontStyle(variants[0]);
+					item['weight']		= this.getFontWeight(variants[0]);
+					item['loaded']		= false;
+					item['favorite']	= false;
 
 					data[category].push(item);
 				}
@@ -263,6 +272,23 @@ export default {
 		},
 
 		/*
+		 * Store font as favorite
+		 */
+		selectFavorite: function(font) {
+			font.favorite = font.favorite ? false : true;
+
+			if (font.favorite) {
+				this.data['favorites'].push(font);
+			}
+			else {
+				var index = this.data['favorites'].indexOf(font);
+				this.data['favorites'].splice(index, 1);
+			}
+
+			this.favoriteAmount = this.data['favorites'].length;
+		},
+
+		/*
 		 * Close the window/component
 		 */
 		close: function() {
@@ -279,7 +305,6 @@ export default {
 	
 			this.timer = setTimeout(() => {
 				const $els = this.$content.querySelectorAll('.font');
-				const that = this;
 
 				for (let i=0; i<$els.length; i++) {
 					const $el	= $els[i];
@@ -300,16 +325,20 @@ export default {
 		 * Load the font, done with Google Font Loader JS
 		 */
 		loadFont: function(font) {
+			const that = this;
+
 			WebFont.load({
 				google: {
 					families: [font.family]
 				},
 				fontloading: function(family, fvd) {
 					font.init = true;
+					//that.amount++;
 				},
 				fontactive: function(family, fvd) {
 					font.init	= false;
 					font.loaded	= true;
+					//that.amount--;
 				}
 			});
 		},
@@ -345,7 +374,7 @@ export default {
 					for (let i=0; i<fonts.length; i++) {
 						const font = fonts[i];
 
-						if (font.family.toLowerCase().indexOf(this.searchQuery.toLowerCase()) != -1) {
+						if (font.family.toLowerCase().indexOf(this.searchQuery.toLowerCase()) !== -1 && result.indexOf(font) === -1) {
 							result.push(font);
 						}
 					}

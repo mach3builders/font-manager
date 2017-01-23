@@ -71,7 +71,8 @@ export default {
 	 */
 	data: function () {
 		return {
-			amount				: 0,
+			dispatcher			: undefined,
+			callback			: undefined,
 			favoriteAmount		: 0,
 			state				: '',
 			mutableFontFamily	: this.fontFamily,
@@ -124,16 +125,18 @@ export default {
 		 * Show the font manager, yo!
 		 */
 		show: function() {
-			this.state = 'init';
-			setTimeout(() => this.state = 'active', 100);
+			//this.state = 'init';
+			this.state = 'active';
+			//setTimeout(() => this.state = 'active', 100);
 		},
 
 		/*
 		 * Hide the font manager, dude!
 		 */
 		hide: function() {
-			this.state = 'init';
-			setTimeout(() => this.state = '', 400);
+			//this.state = 'init';
+			this.state = '';
+			//setTimeout(() => this.state = '', 400);
 		},
 
 		/*
@@ -143,6 +146,7 @@ export default {
 		buildData: function(items) {
 			const data			= {};
 			data['favorites']	= [];
+			data['web safe']	= [];
 			const families		= [];
 
 			for (let i=0; i<items.length; i++) {
@@ -289,6 +293,10 @@ export default {
 			this.mutableFontFamily	= font.family;
 			this.mutableFontStyle	= font.style;
 			this.mutableFontWeight	= font.weight;
+
+			if (this.callback) this.callback(font, this);
+
+			this.hide();
 		},
 
 		/*
@@ -346,12 +354,10 @@ export default {
 				},
 				fontloading: function(family, fvd) {
 					font.init = true;
-					//that.amount++;
 				},
 				fontactive: function(family, fvd) {
 					font.init	= false;
 					font.loaded	= true;
-					//that.amount--;
 				}
 			});
 		},

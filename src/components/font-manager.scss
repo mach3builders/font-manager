@@ -36,7 +36,7 @@
 	}
 }
 
-#wrapper {
+#font-manager {
 	align-items: center;
 	bottom: 0;
 	color: #2c3e50;
@@ -428,7 +428,7 @@
 
 	&.active {
 		display: flex;
-		
+
 		&:before {
 			height: 100%;
 			opacity: .8;

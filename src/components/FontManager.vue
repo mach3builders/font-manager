@@ -1,7 +1,7 @@
-<style lang="scss" src="./font-manager.scss" scoped></style>
+<style lang="scss" src="./font-manager.scss"></style>
 
 <template>
-<section :class="state" id="wrapper">
+<section :class="state" id="font-manager">
 	<div>
 		<nav>
 			<h2>Categorie&euml;n</h2>
@@ -28,7 +28,7 @@
 				
 				<h2 v-if="currentCategory.length">Resultaten: {{ currentFonts.length }}</h2>
 				<div class="fonts">
-					<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in currentFonts" :data-font="getLoaderFont(font)">
+					<div class="font" :class="{ loader: isFontLoaded(font) }" v-for="(font, key) in currentFonts" :data-font="getLoaderFont(font)">
 						<div class="wrapper">
 							<div class="example">
 								<div class="family">
@@ -97,13 +97,19 @@ export default {
 	mounted: function() {
 		this.$content = this.$el.querySelector('#content');
 		
-		// https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyA1qNMkRHQqrv5fW5uuvlm0oCfw731LPIc
-		this.$http.get('./static/json/get-fonts.json').then((response) => {
-			const items = response.body.items;
+		if (!this.$parent.$data.items) {
+			// https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyA1qNMkRHQqrv5fW5uuvlm0oCfw731LPIc
+			this.$http.get('./static/json/get-fonts.json').then((response) => {
+				const items = response.body.items;
+				this.buildData(items);
+			}, (response) => {
+				console.error(response);
+			})
+		}
+		else {
+			const items = this.$parent.$data.items;
 			this.buildData(items);
-		}, (response) => {
-			console.error(response);
-		})
+		}
 	},
 
 	/*
@@ -125,18 +131,14 @@ export default {
 		 * Show the font manager, yo!
 		 */
 		show: function() {
-			//this.state = 'init';
 			this.state = 'active';
-			//setTimeout(() => this.state = 'active', 100);
 		},
 
 		/*
 		 * Hide the font manager, dude!
 		 */
 		hide: function() {
-			//this.state = 'init';
 			this.state = '';
-			//setTimeout(() => this.state = '', 400);
 		},
 
 		/*
@@ -171,7 +173,8 @@ export default {
 			// set the complete data object here
 			this.data = data;
 
-			this.currentCategory = 'favorites';
+			// select category
+			this.selectCategory('sans-serif');
 		},
 
 		/*
@@ -179,6 +182,13 @@ export default {
 		 */
 		isActiveCategory: function(category) {
 			return this.currentCategory === category;
+		},
+
+		/*
+		 * Check if the font is loaded
+		 */
+		isFontLoaded: function(font) {
+			return font.loaded ? false : true;
 		},
 
 		/*

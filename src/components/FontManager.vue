@@ -1,52 +1,54 @@
 <style lang="scss" src="./font-manager.scss" scoped></style>
 
 <template>
-<section :class="{ active: active }" id="wrapper">
-	<nav>
-		<h2>Categorie&euml;n</h2>
-		<ul>
-			<li v-for="(item, category) in data">
-				<a :class="{ active: isActiveCategory(category) }" v-on:click="selectCategory(category)">
-					<span class="name">{{ category }}</span>
-					<span class="label" v-if="category == 'favorites'">{{ favoriteAmount }}</span>
-				</a>
-			</li>
-		</ul>
-	</nav>
-	<main>
-		<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily)">
-		<header>
-			<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }"><i class="icon"></i><span>{{ mutableFontFamily }}</span></div>
-			<div class="search"><input type="text" v-model="searchQuery" placeholder="Zoeken in alle categorieën" maxlength="50"></div>
-			<div class="close" v-on:click="close"><i class="icon"></i></div>
-		</header>
-		<section id="content" v-on:scroll="loadFonts">
-			<input type="hidden" name="font[0]" :value="mutableFontFamily" id="my-font-family">
-			<input type="hidden" name="style[0]" :value="mutableFontStyle" id="my-font-style">
-			<input type="hidden" name="weight[0]" :value="mutableFontWeight" id="my-font-weight">
-			
-			<h2 v-if="currentCategory.length">Resultaten: {{ currentFonts.length }}</h2>
-			<div class="fonts">
-				<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in currentFonts" :data-font="getLoaderFont(font)">
-					<div class="wrapper">
-						<div class="example">
-							<div class="family">
-								<div class="name">{{ font.family }}</div>
-								<div class="variants">
-									<span v-for="variant in font.variants" :class="variant == font.variant ? 'active' : ''" v-on:click="selectVariant(font, variant)">{{ variant }}</span>
+<section :class="state" id="wrapper">
+	<div>
+		<nav>
+			<h2>Categorie&euml;n</h2>
+			<ul>
+				<li v-for="(item, category) in data">
+					<a :class="{ active: isActiveCategory(category) }" v-on:click="selectCategory(category)">
+						<span class="name">{{ category }}</span>
+						<span class="label" v-if="category == 'favorites'">{{ favoriteAmount }}</span>
+					</a>
+				</li>
+			</ul>
+		</nav>
+		<main>
+			<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily)">
+			<header>
+				<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }"><i class="icon"></i><span>{{ mutableFontFamily }}</span></div>
+				<div class="search"><input type="text" v-model="searchQuery" placeholder="Zoeken in alle categorieën" maxlength="50"></div>
+				<div class="close" v-on:click="hide"><i class="icon"></i></div>
+			</header>
+			<section id="content" v-on:scroll="loadFonts">
+				<input type="hidden" name="font[0]" :value="mutableFontFamily" id="my-font-family">
+				<input type="hidden" name="style[0]" :value="mutableFontStyle" id="my-font-style">
+				<input type="hidden" name="weight[0]" :value="mutableFontWeight" id="my-font-weight">
+				
+				<h2 v-if="currentCategory.length">Resultaten: {{ currentFonts.length }}</h2>
+				<div class="fonts">
+					<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in currentFonts" :data-font="getLoaderFont(font)">
+						<div class="wrapper">
+							<div class="example">
+								<div class="family">
+									<div class="name">{{ font.family }}</div>
+									<div class="variants">
+										<span v-for="variant in font.variants" :class="variant == font.variant ? 'active' : ''" v-on:click="selectVariant(font, variant)">{{ variant }}</span>
+									</div>
 								</div>
+								<div class="text" :style="{ fontFamily:''+font.family+'',fontStyle:font.style,fontWeight:font.weight }"><i class="icon"></i><span>The quick brown fox jumps over the lazy dog</span></div>
 							</div>
-							<div class="text" :style="{ fontFamily:''+font.family+'',fontStyle:font.style,fontWeight:font.weight }"><i class="icon"></i><span>The quick brown fox jumps over the lazy dog</span></div>
-						</div>
-						<div class="actions">
-							<div class="icons"><i class="icon favorite" :class="font.favorite ? 'yes' : ''" v-on:click="selectFavorite(font)"></i></div>
-							<a class="btn" v-on:click="selectFont(font)">Selecteren</div>
+							<div class="actions">
+								<div class="icons"><i class="icon favorite" :class="font.favorite ? 'yes' : ''" v-on:click="selectFavorite(font)"></i></div>
+								<a class="btn" v-on:click="selectFont(font)">Selecteren</div>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</section>
-	</main>
+			</section>
+		</main>
+	</div>
 </section>
 </template>
 
@@ -71,7 +73,7 @@ export default {
 		return {
 			amount				: 0,
 			favoriteAmount		: 0,
-			active				: true,
+			state				: '',
 			mutableFontFamily	: this.fontFamily,
 			mutableFontStyle	: this.fontStyle || 'normal',
 			mutableFontWeight	: this.fontWeight || 'normal',
@@ -117,6 +119,22 @@ export default {
 	 * Component methods
 	 */
 	methods: {
+
+		/*
+		 * Show the font manager, yo!
+		 */
+		show: function() {
+			this.state = 'init';
+			setTimeout(() => this.state = 'active', 100);
+		},
+
+		/*
+		 * Hide the font manager, dude!
+		 */
+		hide: function() {
+			this.state = 'init';
+			setTimeout(() => this.state = '', 400);
+		},
 
 		/*
 		 * Here we build the data used in this component
@@ -288,13 +306,6 @@ export default {
 			}
 
 			this.favoriteAmount = this.data['favorites'].length;
-		},
-
-		/*
-		 * Close the window/component
-		 */
-		close: function() {
-			this.active = false;
 		},
 
 		/*

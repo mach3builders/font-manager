@@ -148,6 +148,8 @@ export default {
 
 			// set the complete data object here
 			this.data = data;
+
+			this.currentCategory = 'favorites';
 		},
 
 		/*

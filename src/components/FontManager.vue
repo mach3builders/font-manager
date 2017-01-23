@@ -1,7 +1,7 @@
 <style lang="scss" src="./font-manager.scss" scoped></style>
 
 <template>
-<section id="wrapper">
+<section :class="{ active: active }" id="wrapper">
 	<nav>
 		<h2>Categorie&euml;n</h2>
 		<ul>
@@ -11,14 +11,15 @@
 	<main>
 		<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily)">
 		<header>
-			<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }">Gekozen:&nbsp;<span>{{ mutableFontFamily }}</span></div>
+			<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }"><i class="icon"></i><span>{{ mutableFontFamily }}</span></div>
 			<div class="search"><input type="text" v-model="searchQuery" placeholder="Zoeken in alle categorieën" maxlength="50"></div>
 			<div class="close" v-on:click="close"><i class="icon"></i></div>
 		</header>
 		<section id="content" v-on:scroll="loadFonts">
-			<input type="text" name="font[0]" :value="mutableFontFamily" id="my-font-family">
-			<input type="text" name="style[0]" :value="mutableFontStyle" id="my-font-style">
-			<input type="text" name="weight[0]" :value="mutableFontWeight" id="my-font-weight">
+			<input type="hidden" name="font[0]" :value="mutableFontFamily" id="my-font-family">
+			<input type="hidden" name="style[0]" :value="mutableFontStyle" id="my-font-style">
+			<input type="hidden" name="weight[0]" :value="mutableFontWeight" id="my-font-weight">
+			
 			<h2 v-if="currentCategory.length">Resultaten: {{ currentFonts.length }}</h2>
 			<div class="fonts">
 				<div class="font" :class="font.loaded ? '' : 'loader'" v-for="(font, key) in currentFonts" :data-font="getLoaderFont(font)">
@@ -63,6 +64,7 @@ export default {
 	 */
 	data: function () {
 		return {
+			active				: false,
 			mutableFontFamily	: this.fontFamily,
 			mutableFontStyle	: this.fontStyle || 'normal',
 			mutableFontWeight	: this.fontWeight || 'normal',
@@ -264,7 +266,7 @@ export default {
 		 * Close the window/component
 		 */
 		close: function() {
-			alert('Close window');
+			this.active = false;
 		},
 
 		/*

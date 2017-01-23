@@ -13,14 +13,59 @@ body {
 	padding: 0;
 }
 
+.font-handlers {
+	border-bottom: 1px solid #dee2e6;
+	padding: 20px;
+}
+
+.font-handler {
+	align-items: center;
+	background-color: #fff;
+	border: 1px solid #dee2e6;
+	border-radius: 3px;
+	box-sizing: border-box;
+	color: #273142;
+	display: flex;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	height: 40px;
+	line-height: 20px;
+	padding: 0 9px;
+	text-decoration: none;
+	width: 250px;
+}
+
+.font-handler span {
+	flex-grow: 1;
+}
+
+.font-handler .icon {
+	background: url(/static/icons/font.svg);
+	background-size: 20px 20px;
+	display: block;
+	flex-shrink: 0;
+	height: 20px;
+	opacity: .4;
+	transition: opacity .2s ease-out;
+	width: 20px;
+}
+
+.font-handler:hover .icon {
+	opacity: .6;
+}
+
 #app {
 	height: 100%;
 }
 </style>
 </head>
 <body>
+	<div class="font-handlers">
+		<a href="#" class="font-handler"><span>ABeezee</span><i class="icon"></i></a>
+	</div>
+
 	<div id="app">
-		<font-manager font-family="Aladin" font-style="regular" font-weight="bold"></font-manager>
+		<font-manager font-family="Aladin" font-style="regular" font-weight="bold" ref="fontManager"></font-manager>
 	</div>
 </body>
 </html>

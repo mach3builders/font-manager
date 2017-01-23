@@ -38,13 +38,17 @@
 
 #wrapper {
 	color: #2c3e50;
-	display: flex;
+	display: none;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	height: 100%;
 
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-font-smoothing: antialiased;
+
+	&.active {
+		display: flex;
+	}
 
 	h2 {
 		font-size: 12px;
@@ -102,8 +106,20 @@
 			height: 50px;
 
 			.font {
+				align-items: center;
+				display: flex;
 				line-height: 20px;
 				padding-left: 40px;
+
+				.icon {
+					background: url(/static/icons/font.svg);
+  					background-size: 20px 20px;
+					display: block;
+					height: 20px;
+					margin-right: 5px;
+					opacity: .4;
+					width: 20px;
+				}
 			}
 
 			.font,

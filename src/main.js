@@ -4,9 +4,26 @@ import FontManager from './components/FontManager'
 
 Vue.use(VueResource)
 
-new Vue({
-	el: '#app',
-	components: {
-		FontManager
+document.addEventListener('DOMContentLoaded', function()
+{
+	const $handlers		= document.querySelectorAll('.font-handler');
+	const $fontManager	= document.querySelector('font-manager');
+
+	if ($handlers.length && $fontManager) {
+		var fm = new Vue({
+			el: '#app',
+			components: {
+				FontManager
+			}
+		});
+
+		for (let i=0; i<$handlers.length; i++) {
+			const $handler = $handlers[i];
+			
+			$handler.addEventListener('click', (e) => {
+				e.preventDefault();
+				fm.$refs.fontManager.active = true;
+			});
+		}
 	}
-})
+});

@@ -314,7 +314,7 @@
 									}
 
 									> span {
-										opacity: 1;
+										opacity: 0;
 										transition: opacity .6s ease-out;
 									}
 								}
@@ -329,6 +329,8 @@
 									display: flex;
 									flex-grow: 1;
 									justify-content: flex-end;
+									opacity: 0;
+									transition: opacity .2s ease-out;
 
 									.icon {
 										background: url(/static/icons/favorite-border.svg);
@@ -360,25 +362,6 @@
 							}
 						}
 
-
-						&:not(.loader):hover {
-							.wrapper {
-								.example {
-									.family {
-										.variants {
-											opacity: 1;
-										}
-									}
-								}
-								
-								.actions {
-									.btn {
-										opacity: 1;
-									}
-								}
-							}
-						}
-
 						&.loader {
 							.wrapper {
 								.example {
@@ -387,10 +370,41 @@
 											display: block;
 											@include loader;
 										}
+									}
+								}
+							}
+						}
 
-										> span {
-											opacity: 0;
-											transition: opacity 0s ease-out;
+						&.loaded {
+							.wrapper {
+								.example {
+									.text {
+										span {
+											opacity: 1;
+										}
+									}
+								}
+
+								.actions {
+									.icons {
+										opacity: 1;
+									}
+								}
+							}
+
+							&:hover {
+								.wrapper {
+									.example {
+										.family {
+											.variants {
+												opacity: 1;
+											}
+										}
+									}
+									
+									.actions {
+										.btn {
+											opacity: 1;
 										}
 									}
 								}

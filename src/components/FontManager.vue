@@ -26,9 +26,9 @@
 				<input type="hidden" name="style[0]" :value="mutableFontStyle" id="my-font-style">
 				<input type="hidden" name="weight[0]" :value="mutableFontWeight" id="my-font-weight">
 				
-				<h2 v-if="currentCategory.length">Resultaten: {{ currentFonts.length }}</h2>
+				<h2 v-if="currentCategory">Resultaten: {{ currentFonts.length }}</h2>
 				<div class="fonts">
-					<div class="font" :class="{ loader: isFontLoaded(font) }" v-for="(font, key) in currentFonts" :data-font="getLoaderFont(font)">
+					<div class="font" :class="{ loader: font.init, loaded: font.loaded }" v-for="font in currentFonts" :data-font="getLoaderFont(font)">
 						<div class="wrapper">
 							<div class="example">
 								<div class="family">
@@ -84,7 +84,7 @@ export default {
 			searchQuery			: '',
     		searchQueryIsDirty	: false,
 			isCalculating		: false,
-			currentCategory		: { type: String },
+			currentCategory		: undefined,
 			currentFonts		: [],
 			timer				: undefined,
 			delay				: 200
@@ -132,6 +132,9 @@ export default {
 		 */
 		show: function() {
 			this.state = 'active';
+
+			// select category
+			if (!this.currentCategory) this.selectCategory('favorites');
 		},
 
 		/*
@@ -146,10 +149,8 @@ export default {
 		 * This is done in the "mounted" lifecycle method
 		 */
 		buildData: function(items) {
-			const data			= {};
-			data['favorites']	= [];
-			data['web safe']	= [];
-			const families		= [];
+			this.$set(this.data, 'favorites', []);
+			this.$set(this.data, 'web safe', []);
 
 			for (let i=0; i<items.length; i++) {
 				const item		= items[i];
@@ -158,23 +159,18 @@ export default {
 				const variants	= item.variants || [];
 
 				if (category && family) {
-					if(!data[category]) data[category] = [];
+					if (!this.data[category]) this.$set(this.data, category, []);
 
-					item['variant']		= variants[0];
-					item['style']		= this.getFontStyle(variants[0]);
-					item['weight']		= this.getFontWeight(variants[0]);
-					item['loaded']		= false;
-					item['favorite']	= false;
+					this.$set(item, 'variant', variants[0]);
+					this.$set(item, 'style', this.getFontStyle(variants[0]));
+					this.$set(item, 'weight', this.getFontWeight(variants[0]));
+					this.$set(item, 'init', false);
+					this.$set(item, 'loaded', false);
+					this.$set(item, 'favorite', false);
 
-					data[category].push(item);
+					this.data[category].push(item);
 				}
 			}
-
-			// set the complete data object here
-			this.data = data;
-
-			// select category
-			this.selectCategory('sans-serif');
 		},
 
 		/*
@@ -182,13 +178,6 @@ export default {
 		 */
 		isActiveCategory: function(category) {
 			return this.currentCategory === category;
-		},
-
-		/*
-		 * Check if the font is loaded
-		 */
-		isFontLoaded: function(font) {
-			return font.loaded ? false : true;
 		},
 
 		/*
@@ -344,10 +333,15 @@ export default {
 					if (!font.loaded) {
 						const visible = this.isVisible($el);
 
-						if (visible && !font.init) {
-							this.loadFont(font);
+						if (visible) {
+							if (!font.init) {
+								$el.classList.add('loader');
+								this.loadFont(font);
+							}
 						}
+						else $el.classList.remove('loader');
 					}
+					else $el.classList.remove('loader');
 				}
 			}, this.delay);
 		},

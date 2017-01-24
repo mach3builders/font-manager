@@ -272,7 +272,9 @@ export default {
 				this.$content.scrollTop	= 0;
 
 				// load fonts
+				//this.$nextTick(() => {
 				this.loadFonts();
+				//});
 			}
 		},
 
@@ -351,7 +353,7 @@ export default {
 		 */
 		loadFont: function(font) {
 			const that = this;
-
+			
 			WebFont.load({
 				google: {
 					families: [font.family]

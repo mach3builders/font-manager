@@ -41,7 +41,7 @@
 							</div>
 							<div class="actions">
 								<div class="icons"><i class="icon favorite" :class="font.favorite ? 'yes' : ''" v-on:click="selectFavorite(font)"></i></div>
-								<a class="btn" v-on:click="selectFont(font)">Selecteren</div>
+								<a class="btn" v-on:click="selectFont(font)">Selecteren</a>
 							</div>
 						</div>
 					</div>

@@ -1,7 +1,7 @@
 // import dependencies
 import Vue from 'vue'
 import VueResource from 'vue-resource'
-import FontManager from './components/FontManager'
+import FontManager from './components/FontManager.vue'
 
 Vue.use(VueResource)
 

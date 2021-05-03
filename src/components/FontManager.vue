@@ -79,7 +79,7 @@ export default {
 			mutableFontStyle	: this.fontStyle || 'normal',
 			mutableFontWeight	: this.fontWeight || 'normal',
 			$content			: undefined,
-			apiUrl				: '//fonts.googleapis.com/css?family=',
+			apiUrl				: '//fonts.googleapis.com/css2?family=',
 			data				: {},
 			searchQuery			: '',
     		searchQueryIsDirty	: false,
@@ -209,7 +209,7 @@ export default {
 		 */
 		getFontLink: function(font) {
 			font = font.replace(/ /g, '+');
-			return '//fonts.googleapis.com/css?family='+font;
+			return '//fonts.googleapis.com/css2?family='+font;
 		},
 
 		/*
@@ -221,7 +221,7 @@ export default {
 			apiFont.push(font.family.replace(/ /g, '+'));
 			
 			if (font.variants[0]) {
-				apiFont.push(':');
+				apiFont.push(':wght@');
 				apiFont.push(font.variants[0]);
 			}
 
@@ -230,9 +230,9 @@ export default {
 				apiFont.push(font.subsets[0]);
 			}
 
-			// example: '//fonts.googleapis.com/css?family=Anonymous+Pro:italic&subset=greek'
+			// example: '//fonts.googleapis.com/css2?family=Anonymous+Pro:italic&subset=greek'
 			var font = apiFont.join('');
-			
+
 			return font;
 		},
 
@@ -244,17 +244,17 @@ export default {
 			apiFont.push(font.family);
 			
 			if (font.variants[0]) {
-				apiFont.push(':');
+				apiFont.push(':wght@');
 				apiFont.push(font.variants[0]);
 			}
 
 			if (font.subsets[0]) {
-				apiFont.push(':');
+				apiFont.push('&subset=');
 				apiFont.push(font.subsets[0]);
 			}
 
 			var font = apiFont.join('');
-			
+
 			return font;
 		},
 
@@ -353,10 +353,27 @@ export default {
 		 */
 		loadFont: function(font) {
 			const that = this;
-			
+			var fontFamily = [];
+			fontFamily.push(font.family);
+
+			if (font.variants[0]) {
+				var cnt = 0;
+				for (let i = 0; i < font.variants.length; i++) {
+					let fontVariant = font.variants[i];
+					if (! fontVariant.includes('regular') && ! fontVariant.includes('italic')) {
+						const prefix = cnt > 0 ? ';' : ':wght@';
+						fontFamily.push((prefix + fontVariant));
+						cnt++;
+					}
+				}
+			}
+
+			var fontFinal = fontFamily.join('');
+
 			WebFont.load({
 				google: {
-					families: [font.family]
+					api: 'https://fonts.googleapis.com/css2',
+					families: [fontFinal]
 				},
 				fontloading: function(family, fvd) {
 					font.init = true;

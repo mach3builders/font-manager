@@ -26,16 +26,19 @@ document.addEventListener('DOMContentLoaded', function()
 			const $dispatcher = vm.dispatcher;
 
 			if ($dispatcher) {
-				const $inputFont	= $dispatcher.querySelector('.fw_ips_field_font');
-				const $inputImport	= $dispatcher.querySelector('.fw_ips_field_font_import');
-				const $name			= $dispatcher.querySelector('span');
+				const $inputFontFamily = $dispatcher.querySelector('.fw_field_font_family');
+				const $inputFontWeight = $dispatcher.querySelector('.fw_field_font_weight');
+				const $inputFamilyImport = $dispatcher.querySelector('.fw_field_font_family_import');
+				const $name = $dispatcher.querySelector('span');
 
-				if ($inputFont && $inputImport) {
+				if ($inputFontFamily && $inputFontWeight && $inputFamilyImport) {
 					const dataValue = font.category == 'web safe' ? 'false' : font.family;
-					$inputFont.setAttribute('data-value', dataValue);
-					$inputFont.value	= font.family;
-					$inputImport.value	= font.family;
-					$name.innerHTML		= font.family;
+					$inputFontFamily.setAttribute('data-value', dataValue);
+					
+					$inputFontFamily.value = font.family;
+					$inputFontWeight.value = font.variant;
+					$inputFamilyImport.value = font.family;
+					$name.innerHTML = font.family;
 				}
 			}
 		}

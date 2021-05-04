@@ -168,6 +168,15 @@ export default {
 					this.$set(item, 'loaded', false);
 					this.$set(item, 'favorite', false);
 
+					let filteredVariants = [];
+					for (let a=0; a<variants.length; a++) {
+						const fontVariant = variants[a];
+						if (! fontVariant.includes('regular') && ! fontVariant.includes('italic')) {
+							filteredVariants.push(fontVariant);
+						}
+					}
+					this.$set(item, 'variants', filteredVariants);
+
 					this.data[category].push(item);
 				}
 			}

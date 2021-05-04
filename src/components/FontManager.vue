@@ -6,16 +6,16 @@
 		<nav>
 			<h2>Categorie&euml;n</h2>
 			<ul>
-				<li v-for="(item, category) in data">
+				<li v-for="(item, category, index) in data" :key="index">
 					<a :class="{ active: isActiveCategory(category) }" v-on:click="selectCategory(category)">
 						<span class="name">{{ category }}</span>
-						<span class="label" v-if="category == 'favorites'">{{ favoriteAmount }}</span>
+						<!-- <span class="label" v-if="category == 'favorites'">{{ favoriteAmount }}</span> -->
 					</a>
 				</li>
 			</ul>
 		</nav>
 		<main>
-			<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily)">
+			<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily, mutableFontWeight)">
 			<header>
 				<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }"><i class="icon"></i><span>{{ mutableFontFamily }}</span></div>
 				<div class="search"><input type="text" v-model="searchQuery" placeholder="Zoeken in alle categorieën" maxlength="50"></div>
@@ -28,19 +28,19 @@
 				
 				<h2 v-if="currentCategory">Resultaten: {{ currentFonts.length }}</h2>
 				<div class="fonts">
-					<div class="font" :class="{ loader: font.init, loaded: font.loaded }" v-for="font in currentFonts" :data-font="getLoaderFont(font)">
+					<div class="font" :class="{ loader: font.init, loaded: font.loaded }" v-for="(font, index) in currentFonts" :data-font="getLoaderFont(font)" :key="index">
 						<div class="wrapper">
 							<div class="example">
 								<div class="family">
 									<div class="name">{{ font.family }}</div>
 									<div class="variants">
-										<span v-for="variant in font.variants" :class="variant == font.variant ? 'active' : ''" v-on:click="selectVariant(font, variant)">{{ variant }}</span>
+										<span v-for="(variant, index) in font.variants" :class="variant == font.variant ? 'active' : ''" v-on:click="selectVariant(font, variant)" :key="index">{{ variant }}</span>
 									</div>
 								</div>
 								<div class="text" :style="{ fontFamily:''+font.family+'',fontStyle:font.style,fontWeight:font.weight }"><i class="icon"></i><span>The quick brown fox jumps over the lazy dog</span></div>
 							</div>
 							<div class="actions">
-								<div class="icons"><i class="icon favorite" :class="font.favorite ? 'yes' : ''" v-on:click="selectFavorite(font)"></i></div>
+								<!-- <div class="icons"><i class="icon favorite" :class="font.favorite ? 'yes' : ''" v-on:click="selectFavorite(font)"></i></div> -->
 								<a class="btn" v-on:click="selectFont(font)">Selecteren</a>
 							</div>
 						</div>
@@ -149,8 +149,8 @@ export default {
 		 * This is done in the "mounted" lifecycle method
 		 */
 		buildData: function(items) {
-			this.$set(this.data, 'favorites', []);
-			this.$set(this.data, 'web safe', []);
+			// this.$set(this.data, 'favorites', []);
+			// this.$set(this.data, 'web safe', []);
 
 			for (let i=0; i<items.length; i++) {
 				const item		= items[i];
@@ -216,9 +216,14 @@ export default {
 		/*
 		 * Some small logic for getting the font link
 		 */
-		getFontLink: function(font) {
-			font = font.replace(/ /g, '+');
-			return '//fonts.googleapis.com/css2?family='+font;
+		getFontLink: function(font, fontWeight) {
+			let fontFamily = font.replace(/ /g, '+');
+
+			if (parseInt(fontWeight) > 0) {
+				fontFamily += ':wght@'+fontWeight;
+			}
+
+			return '//fonts.googleapis.com/css2?family='+fontFamily;
 		},
 
 		/*

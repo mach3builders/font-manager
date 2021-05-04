@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function()
 				if ($inputFontFamily && $inputFontWeight && $inputFamilyImport) {
 					const dataValue = font.category == 'web safe' ? 'false' : font.family;
 					$inputFontFamily.setAttribute('data-value', dataValue);
-					
+
 					$inputFontFamily.value = font.family;
 					$inputFontWeight.value = font.variant;
 					$inputFamilyImport.value = font.family;
@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', function()
 			$handler.addEventListener('click', (e) => {
 				e.preventDefault();
 
-				vm.$refs.fontManager.dispatcher	= $handler;
-				vm.$refs.fontManager.callback	= selectFont.bind();
+				vm.$refs.fontManager.dispatcher = $handler;
+				vm.$refs.fontManager.callback = selectFont.bind();
 				vm.$refs.fontManager.show();
 			});
 		}

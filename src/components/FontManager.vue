@@ -1,7 +1,7 @@
 <style lang="scss" src="./font-manager.scss"></style>
 
 <template>
-<section :class="state" id="font-manager">
+<section :class="state" class="fw_font_manager">
 	<div>
 		<nav>
 			<h2>Categorie&euml;n</h2>
@@ -15,9 +15,9 @@
 			</ul>
 		</nav>
 		<main>
-			<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily, mutableFontWeight)">
+			<link rel="stylesheet" type="text/css" :href="getFontLink(mutableFontFamily, mutableFontWeight)" v-if="getFontLink(mutableFontFamily, mutableFontWeight)">
 			<header>
-				<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }"><i class="icon"></i><span>{{ mutableFontFamily }}</span></div>
+				<div class="font" :style="{ fontFamily:''+mutableFontFamily+'', fontStyle:mutableFontStyle, fontWeight:mutableFontWeight }"><span>{{ mutableFontFamily }}</span></div>
 				<div class="search"><input type="text" v-model="searchQuery" placeholder="Zoeken in alle categorieën" maxlength="50"></div>
 				<div class="close" v-on:click="hide"><i class="icon"></i></div>
 			</header>
@@ -61,9 +61,10 @@ export default {
 	 * Properties passed from <font-manager>
 	 */
 	props: {
-		fontFamily	: { type: String },
-		fontStyle	: { type: String },
-		fontWeight	: { type: String }
+		dataLocation : { type: String },
+		fontFamily : { type: String },
+		fontStyle : { type: String },
+		fontWeight : { type: String }
 	},
 
 	/**
@@ -79,7 +80,6 @@ export default {
 			mutableFontStyle	: this.fontStyle || 'normal',
 			mutableFontWeight	: this.fontWeight || 'normal',
 			$content			: undefined,
-			apiUrl				: '//fonts.googleapis.com/css2?family=',
 			data				: {},
 			searchQuery			: '',
     		searchQueryIsDirty	: false,
@@ -98,8 +98,7 @@ export default {
 		this.$content = this.$el.querySelector('#content');
 		
 		if (!this.$parent.$data.items) {
-			// https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyA1qNMkRHQqrv5fW5uuvlm0oCfw731LPIc
-			this.$http.get('./static/json/get-fonts.json').then((response) => {
+			this.$http.get(this.dataLocation || './static/json/get-fonts.json').then((response) => {
 				const items = response.body.items;
 				this.buildData(items);
 			}, (response) => {
@@ -171,7 +170,7 @@ export default {
 					let filteredVariants = [];
 					for (let a=0; a<variants.length; a++) {
 						const fontVariant = variants[a];
-						if (! fontVariant.includes('regular') && ! fontVariant.includes('italic')) {
+						if (! fontVariant.includes('italic')) {
 							filteredVariants.push(fontVariant);
 						}
 					}
@@ -217,37 +216,17 @@ export default {
 		 * Some small logic for getting the font link
 		 */
 		getFontLink: function(font, fontWeight) {
+			if (! font) {
+				return false;
+			}
+
 			let fontFamily = font.replace(/ /g, '+');
 
 			if (parseInt(fontWeight) > 0) {
 				fontFamily += ':wght@'+fontWeight;
 			}
 
-			return '//fonts.googleapis.com/css2?family='+fontFamily;
-		},
-
-		/*
-		 * Get the full url for the google font api
-		 */
-		getApiUrl: function(font) {
-			var apiFont = [];
-			apiFont.push(this.apiUrl);
-			apiFont.push(font.family.replace(/ /g, '+'));
-			
-			if (font.variants[0]) {
-				apiFont.push(':wght@');
-				apiFont.push(font.variants[0]);
-			}
-
-			if (font.subsets[0]) {
-				apiFont.push('&subset=');
-				apiFont.push(font.subsets[0]);
-			}
-
-			// example: '//fonts.googleapis.com/css2?family=Anonymous+Pro:italic&subset=greek'
-			var font = apiFont.join('');
-
-			return font;
+			return '//fonts.googleapis.com/css2?family='+fontFamily+'&display=swap';
 		},
 
 		/*
@@ -262,10 +241,10 @@ export default {
 				apiFont.push(font.variants[0]);
 			}
 
-			if (font.subsets[0]) {
-				apiFont.push('&subset=');
-				apiFont.push(font.subsets[0]);
-			}
+			// if (font.subsets[0]) {
+			// 	apiFont.push('&subset=');
+			// 	apiFont.push(font.subsets[0]);
+			// }
 
 			var font = apiFont.join('');
 
@@ -370,33 +349,35 @@ export default {
 			var fontFamily = [];
 			fontFamily.push(font.family);
 
-			if (font.variants[0]) {
-				var cnt = 0;
-				for (let i = 0; i < font.variants.length; i++) {
-					let fontVariant = font.variants[i];
-					if (! fontVariant.includes('regular') && ! fontVariant.includes('italic')) {
-						const prefix = cnt > 0 ? ';' : ':wght@';
-						fontFamily.push((prefix + fontVariant));
-						cnt++;
+			if (font.family) {
+				if (font.variants[0]) {
+					var cnt = 0;
+					for (let i = 0; i < font.variants.length; i++) {
+						let fontVariant = font.variants[i];
+						if (! fontVariant.includes('regular') && ! fontVariant.includes('italic')) {
+							const prefix = cnt > 0 ? ';' : ':wght@';
+							fontFamily.push((prefix + fontVariant));
+							cnt++;
+						}
 					}
 				}
+
+				var fontFinal = fontFamily.join('');
+
+				WebFont.load({
+					google: {
+						api: 'https://fonts.googleapis.com/css2',
+						families: [fontFinal]
+					},
+					fontloading: function(family, fvd) {
+						font.init = true;
+					},
+					fontactive: function(family, fvd) {
+						font.init	= false;
+						font.loaded	= true;
+					}
+				});
 			}
-
-			var fontFinal = fontFamily.join('');
-
-			WebFont.load({
-				google: {
-					api: 'https://fonts.googleapis.com/css2',
-					families: [fontFinal]
-				},
-				fontloading: function(family, fvd) {
-					font.init = true;
-				},
-				fontactive: function(family, fvd) {
-					font.init	= false;
-					font.loaded	= true;
-				}
-			});
 		},
 
 		/*

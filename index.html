@@ -13,12 +13,12 @@ body {
 	padding: 0;
 }
 
-.font-handlers {
+.fw_font_manager_handlers {
 	border-bottom: 1px solid #dee2e6;
 	padding: 20px;
 }
 
-.font-handler {
+.fw_font_manager_handler {
 	align-items: center;
 	background-color: #fff;
 	border: 1px solid #dee2e6;
@@ -37,15 +37,22 @@ body {
 	width: 250px;
 }
 
-.font-handler:hover {
+.fw_font_manager_handler:hover {
 	border-color: #7f8fa4;
 }
 
-.font-handler span {
+.fw_font_manager_handler span.fw_name {
 	flex-grow: 1;
 }
 
-.font-handler .icon {
+.fw_font_manager_handler span.fw_weight {
+	color: #aaa;
+	font-size: 12px;
+	flex-shrink: 0;
+	margin-right: 10px;
+}
+
+.fw_font_manager_handler .fw_icon {
 	background: url(/static/icons/font.svg);
 	background-size: 20px 20px;
 	display: block;
@@ -56,7 +63,7 @@ body {
 	width: 20px;
 }
 
-.font-handler:hover .icon {
+.fw_font_manager_handler:hover .icon {
 	opacity: .6;
 }
 
@@ -67,17 +74,24 @@ body {
 <script src="dist/app.js"></script>
 </head>
 <body>
-	<div class="font-handlers">
-		<div class="font-handler">
-			<input type="hidden" name="font_family" value="Aladin" data-value="Aladin" class="fw_field_font_family">
-			<input type="hidden" name="font_weight" value="regular" data-value="regular" class="fw_field_font_weight">
-			<input type="hidden" name="font_family_import" value="Aladin" class="fw_field_font_family_import">
-			<span>Aladin</span><i class="icon"></i>
+	<div class="fw_font_manager_handlers">
+		<div class="fw_font_manager_handler_wrapper">
+			<div class="fw_font_manager_handler">
+				<input type="hidden" name="font_family" value="" data-value="" class="fw_field_font_family">
+				<input type="hidden" name="font_weight" value="regular" data-value="regular" class="fw_field_font_weight">
+				<input type="hidden" name="font_family_import" value="" class="fw_field_font_family_import">
+				<span class="fw_name"></span>
+				<span class="fw_weight">400</span>
+				<i class="fw_icon"></i>
+			</div>
+			<div class="fw_font_manager_app">
+				<font-manager font-family="" font-style="regular" font-weight="bold" ref="fontManager"></font-manager>
+			</div>
 		</div>
 	</div>
 
-	<div id="app">
-		<font-manager font-family="Aladin" font-style="regular" font-weight="bold" ref="fontManager"></font-manager>
-	</div>
+	<script>
+		fwRunFontManager();
+	</script>	
 </body>
 </html>

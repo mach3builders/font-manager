@@ -66,6 +66,7 @@ window.fwRunFontManager = function (dataLocation) {
 				if ($inputFontFamily && $inputFontWeight && $inputFamilyImport) {
 					const dataValue = font.category == 'web safe' ? 'false' : font.family;
 					$inputFontFamily.setAttribute('data-value', dataValue);
+					$inputFontWeight.setAttribute('data-value', font.variant);
 
 					$inputFontFamily.value = font.family;
 					$inputFontWeight.value = font.variant;

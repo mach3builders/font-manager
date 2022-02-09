@@ -25,7 +25,7 @@
   "homepage": "https://github.com/mach3builders/font-manager#readme",
   "devDependencies": {
     "laravel-mix": "^6.0.18",
-    "node-sass": "^5.0.0",
+    "node-sass": "^7.0.0",
     "sass-loader": "^11.0.1",
     "vue": "^2.6.12",
     "vue-loader": "^15.9.6",
